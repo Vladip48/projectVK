@@ -1,0 +1,108 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="css/bootstrap.css" rel="stylesheet" />
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container">
+          <a class="navbar-brand" href="#">AskPupkin</a>
+
+            <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Ask</button>
+            </form>
+
+            <div class="d-flex gap-3 align-items-center">
+                <div class="content">
+                    <div class="content__links">
+                        <a href="#">Log in</a>
+                        <a href="#">Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-3">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="login-container">
+                    <div class="login-form">
+                        <h2>New Question</h2>
+                        
+                        <form>
+                            <div class="mb-4 row align-items-center">
+                                <label class="col-sm-2 col-form-label fw-bold">Title</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" value="How to build a moon park ?">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4 row">
+                                <label class="col-sm-2 col-form-label fw-bold">Text</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" rows="5">Really, how ?
+Have no idea about it</textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4 row align-items-center">
+                                <label class="col-sm-2 col-form-label fw-bold">Tags</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" value="moon, park, puzzle">
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-sm-10 offset-sm-2">
+                                    <button type="submit" class="btn btn-primary">ASK!</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="col-3">
+
+                <section class="mb-3">
+                    <h3>Popular tags</h3>
+                    <div>
+                        <span class="badge rounded-pill text-bg-primary">Primary</span>
+                        <span class="badge rounded-pill text-bg-secondary">Secondary</span>
+                        <span class="badge rounded-pill text-bg-success">Success</span>
+                        <span class="badge rounded-pill text-bg-danger">Danger</span>
+                        <span class="badge rounded-pill text-bg-warning">Warning</span>
+                        <span class="badge rounded-pill text-bg-info">Info</span>
+                        <span class="badge rounded-pill text-bg-light">Light</span>
+                        <span class="badge rounded-pill text-bg-dark">Dark</span>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Best members</h3>
+                    <div>
+                        <a class="d-block" href="#">Member</a>
+                        <a class="d-block" href="#">Member</a>
+                        <a class="d-block" href="#">Member</a>
+                        <a class="d-block" href="#">Member</a>
+                        <a class="d-block" href="#">Member</a>
+                        <a class="d-block" href="#">Member</a>
+                        <a class="d-block" href="#">Member</a>
+                    </div>
+                </section>
+
+            </aside>
+        </div>
+    </main>
+    <script src="js/bootstrap.bundle.js"></script>
+</body>
+
+</html>
