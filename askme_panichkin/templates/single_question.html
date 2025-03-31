@@ -3,7 +3,6 @@
 
 {% block content %}
 <div class="col-lg-8 mb-4">
-    <!-- Question -->
     <div class="row mb-4">
         <div class="col-2">
             <div class="border mb-2 d-flex align-items-center justify-content-center bg-light" style="height: 100px;">
@@ -31,7 +30,6 @@
 
     <hr class="my-4">
 
-    <!-- Answers -->
     {% for answer in question.answers %}
     <div class="card mb-3">
         <div class="card-body">
@@ -57,7 +55,7 @@
         </div>
     </div>
     {% endfor %}
-    <!-- Answer Form -->
+
     <div class="card mt-3">
         <div class="card-body">
             <h5 class="card-title mb-3">Enter your answer here.</h5>
