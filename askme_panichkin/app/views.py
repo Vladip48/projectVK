@@ -3,7 +3,6 @@ from django.core.paginator import Paginator
 import random
 
 
-# Генерация тестовых данных
 def generate_questions(count=30):
     tags = ['python', 'css', 'html', 'javascript', 'bootstrap', 'sql']
     questions = []
@@ -36,7 +35,6 @@ QUESTIONS = generate_questions()
 HOT_QUESTIONS = sorted(QUESTIONS, key=lambda x: x['rating'], reverse=True)
 
 
-# Основные view-функции
 def index(request):
     page_num = request.GET.get('page', 1)
     paginator = Paginator(QUESTIONS, 5)
@@ -62,7 +60,6 @@ def question(request, question_id):
     if not question:
         return render(request, '404.html', status=404)
 
-    # Добавляем ответы к вопросу
     question['answers'] = generate_answers(random.randint(1, 5))
 
     return render(request, 'single_question.html', {
@@ -81,8 +78,6 @@ def tag(request, tag_name):
         'tag_name': tag_name
     })
 
-
-# Авторизация
 def login_view(request):
     error = None
     if request.method == 'POST':
@@ -98,10 +93,8 @@ def signup(request):
     return render(request, 'signup.html')
 
 
-# Создание вопроса
 def ask(request):
     if request.method == 'POST':
-        # Создаем новый вопрос-заглушку
         new_id = len(QUESTIONS) + 1
         new_question = {
             'title': request.POST.get('title', 'New Question'),
@@ -117,7 +110,6 @@ def ask(request):
     return render(request, 'ask.html')
 
 
-# Обработка ответов
 def add_answer(request, question_id):
     if request.method == 'POST':
         question = next((q for q in QUESTIONS if q['id'] == question_id), None)
