@@ -1,0 +1,39 @@
+<!-- templates/layouts/question.html -->
+{% load static %}
+<article class="d-flex gap-3 flex-column mt-2">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-2">
+                    <div style="height: 100px;" class="border mb-2 w-100">
+                        <img src="{% static question.img_path %}" alt="img" class="img-fluid">
+                    </div>
+                    <div>
+                        <input type="number" class="form-control" value="{{ question.rating }}">
+                    </div>
+                </div>
+                <div class="col d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title">
+                            <a href="{% url 'question' question.id %}">{{ question.title }}</a>
+                        </h5>
+                        <p class="card-text">
+                            {{ question.text|truncatewords:30 }}
+                        </p>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <a href="{% url 'question' question.id %}">Answers ({{ question.answers_count }})</a>
+                        </div>
+                        <div class="col">
+                            <span>Tags:</span>
+                            {% for tag in question.tags %}
+                            <a href="{% url 'tag' tag %}" class="badge rounded-pill text-bg-primary me-1">{{ tag }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>

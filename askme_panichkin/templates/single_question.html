@@ -1,0 +1,73 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="col-lg-8 mb-4">
+    <!-- Question -->
+    <div class="row mb-4">
+        <div class="col-2">
+            <div class="border mb-2 d-flex align-items-center justify-content-center bg-light" style="height: 100px;">
+                <img src="{% static question.img_path %}" alt="Avatar" class="img-fluid">
+            </div>
+            <div>
+                <input type="number" class="form-control" value="{{ question.rating }}" min="0">
+            </div>
+        </div>
+        <div class="col d-flex flex-column justify-content-between">
+            <div>
+                <h2 class="mb-3 fw-normal">{{ question.title }}</h2>
+                <p class="mb-3">{{ question.text }}</p>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="me-2">Tags:</span>
+                <div>
+                    {% for tag in question.tags %}
+                        <a href="#" class="badge bg-secondary text-decoration-none me-1">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- Answers -->
+    {% for answer in question.answers %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-2">
+                    <div style="height: 100px;" class="border mb-2 w-100">
+                        <img src="{% static question.img_path %}" alt="img" class="img-fluid">
+                    </div>
+                    <div>
+                        <input type="number" class="form-control" value="{{ answer.rating }}">
+                    </div>
+                </div>
+                <div class="col d-flex flex-column justify-content-between">
+                    <div>
+                        <p class="card-text">{{ answer.text }}</p>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" {% if answer.is_correct %}checked{% endif %}>
+                        <label class="form-check-label">Correct</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <!-- Answer Form -->
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Enter your answer here.</h5>
+            <form>
+                <div class="mb-3">
+                    <textarea class="form-control" rows="5" placeholder="Your answer..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Answer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
