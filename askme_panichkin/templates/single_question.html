@@ -56,6 +56,11 @@
     </div>
     {% endfor %}
 
+    <!-- Добавляем пагинацию для ответов -->
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% include 'layouts/pagination.html' %}
+    {% endif %}
+
     <div class="card mt-3">
         <div class="card-body">
             <h5 class="card-title mb-3">Enter your answer here.</h5>
