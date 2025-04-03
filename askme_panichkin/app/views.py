@@ -3,7 +3,6 @@ from django.core.paginator import Paginator
 import random
 
 
-# Генерация тестовых данных
 def generate_questions(count=30):
     tags = ['python', 'css', 'html', 'javascript', 'bootstrap', 'sql']
     questions = []
@@ -13,6 +12,8 @@ def generate_questions(count=30):
             'id': i,
             'text': f'This is detailed text for question #{i}. ' * 5,
             'rating': random.randint(0, 100),
+            'likes': random.randint(0, 50),
+            'dislikes': random.randint(0, 20),
             'answers_count': random.randint(0, 15),
             'img_path': 'img/image.jpg',
             'tags': random.sample(tags, k=random.randint(1, 3))
@@ -26,6 +27,8 @@ def generate_answers(count=3):
         answers.append({
             'text': f'This is answer #{i}. ' * 10,
             'rating': random.randint(-5, 20),
+            'likes': random.randint(0, 10),
+            'dislikes': random.randint(0, 5),
             'is_correct': random.choice([True, False]),
             'author': f'user{random.randint(1, 100)}'
         })
@@ -36,11 +39,14 @@ QUESTIONS = generate_questions()
 HOT_QUESTIONS = sorted(QUESTIONS, key=lambda x: x['rating'], reverse=True)
 
 
-# Основные view-функции
+def paginate(objects_list, request, per_page=10):
+    paginator = Paginator(objects_list, per_page)
+    page_number = request.GET.get('page', 1)
+    return paginator.get_page(page_number)
+
+
 def index(request):
-    page_num = request.GET.get('page', 1)
-    paginator = Paginator(QUESTIONS, 5)
-    page = paginator.get_page(page_num)
+    page = paginate(QUESTIONS, request, 5)
     return render(request, 'index.html', {
         'questions': page.object_list,
         'page_obj': page
@@ -48,9 +54,7 @@ def index(request):
 
 
 def hot(request):
-    page_num = request.GET.get('page', 1)
-    paginator = Paginator(HOT_QUESTIONS, 5)
-    page = paginator.get_page(page_num)
+    page = paginate(HOT_QUESTIONS, request, 5)
     return render(request, 'hot.html', {
         'questions': page.object_list,
         'page_obj': page
@@ -62,19 +66,20 @@ def question(request, question_id):
     if not question:
         return render(request, '404.html', status=404)
 
-    # Добавляем ответы к вопросу
-    question['answers'] = generate_answers(random.randint(1, 5))
+    answers = generate_answers(random.randint(1, 15))
+    page = paginate(answers, request, 3)
+
+    question['answers'] = page.object_list
 
     return render(request, 'single_question.html', {
-        'question': question
+        'question': question,
+        'page_obj': page
     })
 
 
 def tag(request, tag_name):
     tagged_questions = [q for q in QUESTIONS if tag_name in q['tags']]
-    page_num = request.GET.get('page', 1)
-    paginator = Paginator(tagged_questions, 5)
-    page = paginator.get_page(page_num)
+    page = paginate(tagged_questions, request, 5)
     return render(request, 'tag.html', {
         'questions': page.object_list,
         'page_obj': page,
@@ -82,7 +87,6 @@ def tag(request, tag_name):
     })
 
 
-# Авторизация
 def login_view(request):
     error = None
     if request.method == 'POST':
@@ -98,10 +102,8 @@ def signup(request):
     return render(request, 'signup.html')
 
 
-# Создание вопроса
 def ask(request):
     if request.method == 'POST':
-        # Создаем новый вопрос-заглушку
         new_id = len(QUESTIONS) + 1
         new_question = {
             'title': request.POST.get('title', 'New Question'),
@@ -117,7 +119,6 @@ def ask(request):
     return render(request, 'ask.html')
 
 
-# Обработка ответов
 def add_answer(request, question_id):
     if request.method == 'POST':
         question = next((q for q in QUESTIONS if q['id'] == question_id), None)
@@ -134,8 +135,3 @@ def add_answer(request, question_id):
             question['answers_count'] = len(question['answers'])
         return redirect('question', question_id=question_id)
     return redirect('index')
-
-def paginate(objects_list, request, per_page=10):
-    paginator = Paginator(objects_list, per_page)
-    page_number = request.GET.get('page', 1)
-    return paginator.get_page(page_number)

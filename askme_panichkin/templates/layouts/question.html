@@ -8,7 +8,7 @@
                         <img src="{% static question.img_path %}" alt="img" class="img-fluid">
                     </div>
                     <div class="d-flex flex-column align-items-center">
-                        <!-- Кнопка лайка -->
+
                         <button class="btn btn-sm btn-outline-success d-flex align-items-center mb-1"
                                 onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
                             <i class="bi bi-arrow-up me-1"></i>
@@ -17,7 +17,6 @@
                             </span>
                         </button>
 
-                        <!-- Кнопка дизлайка -->
                         <button class="btn btn-sm btn-outline-danger d-flex align-items-center"
                                 onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
                             <i class="bi bi-arrow-down me-1"></i>
