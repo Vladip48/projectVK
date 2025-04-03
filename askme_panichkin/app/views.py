@@ -35,10 +35,14 @@ QUESTIONS = generate_questions()
 HOT_QUESTIONS = sorted(QUESTIONS, key=lambda x: x['rating'], reverse=True)
 
 
+def paginate(objects_list, request, per_page=10):
+    paginator = Paginator(objects_list, per_page)
+    page_number = request.GET.get('page', 1)
+    return paginator.get_page(page_number)
+
+
 def index(request):
-    page_num = request.GET.get('page', 1)
-    paginator = Paginator(QUESTIONS, 5)
-    page = paginator.get_page(page_num)
+    page = paginate(QUESTIONS, request, 5)
     return render(request, 'index.html', {
         'questions': page.object_list,
         'page_obj': page
@@ -46,9 +50,7 @@ def index(request):
 
 
 def hot(request):
-    page_num = request.GET.get('page', 1)
-    paginator = Paginator(HOT_QUESTIONS, 5)
-    page = paginator.get_page(page_num)
+    page = paginate(HOT_QUESTIONS, request, 5)
     return render(request, 'hot.html', {
         'questions': page.object_list,
         'page_obj': page
@@ -69,14 +71,13 @@ def question(request, question_id):
 
 def tag(request, tag_name):
     tagged_questions = [q for q in QUESTIONS if tag_name in q['tags']]
-    page_num = request.GET.get('page', 1)
-    paginator = Paginator(tagged_questions, 5)
-    page = paginator.get_page(page_num)
+    page = paginate(tagged_questions, request, 5)
     return render(request, 'tag.html', {
         'questions': page.object_list,
         'page_obj': page,
         'tag_name': tag_name
     })
+
 
 def login_view(request):
     error = None
@@ -126,8 +127,3 @@ def add_answer(request, question_id):
             question['answers_count'] = len(question['answers'])
         return redirect('question', question_id=question_id)
     return redirect('index')
-
-def paginate(objects_list, request, per_page=10):
-    paginator = Paginator(objects_list, per_page)
-    page_number = request.GET.get('page', 1)
-    return paginator.get_page(page_number)
