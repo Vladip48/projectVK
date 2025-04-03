@@ -3,7 +3,6 @@
     <div class="container">
         <a class="navbar-brand" href="{% url 'index' %}">AskPupkin</a>
 
-        <!-- Форма поиска -->
         <form class="d-flex me-3" role="search" action="{% url 'index' %}">
             <input class="form-control me-2" type="search" name="q" placeholder="Search">
             <a href="{% url 'ask' %}" class="btn btn-primary me-3">Ask</a>
@@ -11,7 +10,6 @@
 
         <div class="d-flex gap-3 align-items-center">
             {% if user.is_authenticated %}
-                <!-- Авторизованный пользователь -->
                 <div>
                     <img src="{% static 'images/avatar.jpg' %}" class="img-thumbnail" width="40">
                 </div>
@@ -23,7 +21,6 @@
                     </div>
                 </div>
             {% else %}
-                <!-- Гость -->
                 <div class="d-flex gap-2">
                     <a href="{% url 'login' %}">Log in</a>
                     <a href="{% url 'signup' %}">Register</a>
