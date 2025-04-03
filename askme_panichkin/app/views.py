@@ -12,6 +12,8 @@ def generate_questions(count=30):
             'id': i,
             'text': f'This is detailed text for question #{i}. ' * 5,
             'rating': random.randint(0, 100),
+            'likes': random.randint(0, 50),  # Добавляем лайки
+            'dislikes': random.randint(0, 20),  # Добавляем дизлайки
             'answers_count': random.randint(0, 15),
             'img_path': 'img/image.jpg',
             'tags': random.sample(tags, k=random.randint(1, 3))
@@ -25,6 +27,8 @@ def generate_answers(count=3):
         answers.append({
             'text': f'This is answer #{i}. ' * 10,
             'rating': random.randint(-5, 20),
+            'likes': random.randint(0, 10),  # Лайки для ответов
+            'dislikes': random.randint(0, 5),  # Дизлайки для ответов
             'is_correct': random.choice([True, False]),
             'author': f'user{random.randint(1, 100)}'
         })
