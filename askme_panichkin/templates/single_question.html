@@ -3,14 +3,30 @@
 
 {% block content %}
 <div class="col-lg-8 mb-4">
-    <!-- Question -->
+    <!-- Question Section -->
     <div class="row mb-4">
         <div class="col-2">
             <div class="border mb-2 d-flex align-items-center justify-content-center bg-light" style="height: 100px;">
                 <img src="{% static question.img_path %}" alt="Avatar" class="img-fluid">
             </div>
-            <div>
-                <input type="number" class="form-control" value="{{ question.rating }}" min="0">
+            <div class="d-flex flex-column align-items-center">
+                <!-- Кнопка лайка -->
+                <button class="btn btn-sm btn-outline-success d-flex align-items-center mb-1"
+                        onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
+                    <i class="bi bi-arrow-up me-1"></i>
+                    <span class="badge bg-success bg-opacity-10 text-success ms-1">
+                        {{ question.likes|default:0 }}
+                    </span>
+                </button>
+
+                <!-- Кнопка дизлайка -->
+                <button class="btn btn-sm btn-outline-danger d-flex align-items-center"
+                        onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
+                    <i class="bi bi-arrow-down me-1"></i>
+                    <span class="badge bg-danger bg-opacity-10 text-danger ms-1">
+                        {{ question.dislikes|default:0 }}
+                    </span>
+                </button>
             </div>
         </div>
         <div class="col d-flex flex-column justify-content-between">
@@ -22,7 +38,7 @@
                 <span class="me-2">Tags:</span>
                 <div>
                     {% for tag in question.tags %}
-                        <a href="#" class="badge bg-secondary text-decoration-none me-1">{{ tag }}</a>
+                        <a href="{% url 'tag' tag %}" class="badge bg-secondary text-decoration-none me-1">{{ tag }}</a>
                     {% endfor %}
                 </div>
             </div>
@@ -31,7 +47,7 @@
 
     <hr class="my-4">
 
-    <!-- Answers -->
+    <!-- Answers Section -->
     {% for answer in question.answers %}
     <div class="card mb-3">
         <div class="card-body">
@@ -40,8 +56,24 @@
                     <div style="height: 100px;" class="border mb-2 w-100">
                         <img src="{% static question.img_path %}" alt="img" class="img-fluid">
                     </div>
-                    <div>
-                        <input type="number" class="form-control" value="{{ answer.rating }}">
+                    <div class="d-flex flex-column align-items-center">
+                        <!-- Кнопка лайка для ответа -->
+                        <button class="btn btn-sm btn-outline-success d-flex align-items-center mb-1"
+                                onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
+                            <i class="bi bi-arrow-up me-1"></i>
+                            <span class="badge bg-success bg-opacity-10 text-success ms-1">
+                                {{ answer.likes|default:0 }}
+                            </span>
+                        </button>
+
+                        <!-- Кнопка дизлайка для ответа -->
+                        <button class="btn btn-sm btn-outline-danger d-flex align-items-center"
+                                onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
+                            <i class="bi bi-arrow-down me-1"></i>
+                            <span class="badge bg-danger bg-opacity-10 text-danger ms-1">
+                                {{ answer.dislikes|default:0 }}
+                            </span>
+                        </button>
                     </div>
                 </div>
                 <div class="col d-flex flex-column justify-content-between">
@@ -57,6 +89,10 @@
         </div>
     </div>
     {% endfor %}
+
+    <!-- Pagination -->
+    {% include 'layouts/pagination.html' %}
+
     <!-- Answer Form -->
     <div class="card mt-3">
         <div class="card-body">
