@@ -62,10 +62,14 @@ def question(request, question_id):
     if not question:
         return render(request, '404.html', status=404)
 
-    question['answers'] = generate_answers(random.randint(1, 5))
+    answers = generate_answers(random.randint(1, 15))  # Увеличил максимальное количество ответов
+    page = paginate(answers, request, 3)  # 3 ответа на страницу
+
+    question['answers'] = page.object_list
 
     return render(request, 'single_question.html', {
-        'question': question
+        'question': question,
+        'page_obj': page  # Передаем объект страницы в шаблон
     })
 
 
