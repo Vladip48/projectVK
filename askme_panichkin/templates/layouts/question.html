@@ -7,8 +7,13 @@
                     <div style="height: 100px;" class="border mb-2 w-100">
                         <img src="{% static question.img_path %}" alt="img" class="img-fluid">
                     </div>
-                    <div>
-                        <input type="number" class="form-control" value="{{ question.rating }}">
+                    <div class="btn-group-vertical w-100" style="gap: 0.25rem;">
+                        <button class="btn btn-sm btn-outline-success py-0 px-1 like-btn" data-target="question{{ question.id }}Likes">
+                            <i class="bi bi-arrow-up"></i> <span id="question{{ question.id }}Likes">{{ question.rating }}</span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger py-0 px-1 dislike-btn" data-target="question{{ question.id }}Likes">
+                            <i class="bi bi-arrow-down"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="col d-flex flex-column justify-content-between">
