@@ -11,13 +11,17 @@
         <div class="d-flex gap-3 align-items-center">
             {% if user.is_authenticated %}
                 <div>
-                    <img src="{% static 'images/avatar.jpg' %}" class="img-thumbnail" width="40">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" class="img-thumbnail" width="40">
+                    {% else %}
+                        <img src="{% static 'images/default_avatar.jpg' %}" class="img-thumbnail" width="40">
+                    {% endif %}
                 </div>
                 <div>
                     <div>{{ user.username }}</div>
                     <div class="d-flex gap-2">
                         <a href="#">Settings</a>
-                        <a href="#">Log out</a>
+                        <a href="{% url 'logout' %}">Log out</a>
                     </div>
                 </div>
             {% else %}

@@ -1,42 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-import random
-
-
-def generate_questions(count=30):
-    tags = ['python', 'css', 'html', 'javascript', 'bootstrap', 'sql']
-    questions = []
-    for i in range(1, count + 1):
-        questions.append({
-            'title': f'Question title {i}',
-            'id': i,
-            'text': f'This is detailed text for question #{i}. ' * 5,
-            'rating': random.randint(0, 100),
-            'likes': random.randint(0, 50),
-            'dislikes': random.randint(0, 20),
-            'answers_count': random.randint(0, 15),
-            'img_path': 'img/image.jpg',
-            'tags': random.sample(tags, k=random.randint(1, 3))
-        })
-    return questions
-
-
-def generate_answers(count=3):
-    answers = []
-    for i in range(1, count + 1):
-        answers.append({
-            'text': f'This is answer #{i}. ' * 10,
-            'rating': random.randint(-5, 20),
-            'likes': random.randint(0, 10),
-            'dislikes': random.randint(0, 5),
-            'is_correct': random.choice([True, False]),
-            'author': f'user{random.randint(1, 100)}'
-        })
-    return answers
-
-
-QUESTIONS = generate_questions()
-HOT_QUESTIONS = sorted(QUESTIONS, key=lambda x: x['rating'], reverse=True)
+from django.contrib.auth.decorators import login_required
+from .models import Question, Answer, Tag, QuestionLike, AnswerLike
+from django.db.models import Count
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from app.models import Profile
 
 
 def paginate(objects_list, request, per_page=10):
@@ -46,15 +17,22 @@ def paginate(objects_list, request, per_page=10):
 
 
 def index(request):
-    page = paginate(QUESTIONS, request, 5)
+    questions = Question.objects.new().annotate(
+        answers_count=Count('answer_question')
+    )
+    page = paginate(questions, request, 5)
     return render(request, 'index.html', {
         'questions': page.object_list,
         'page_obj': page
     })
 
 
+
 def hot(request):
-    page = paginate(HOT_QUESTIONS, request, 5)
+    questions = Question.objects.hot().annotate(
+        answers_count=Count('answer_question')
+    )
+    page = paginate(questions, request, 5)
     return render(request, 'hot.html', {
         'questions': page.object_list,
         'page_obj': page
@@ -62,24 +40,28 @@ def hot(request):
 
 
 def question(request, question_id):
-    question = next((q for q in QUESTIONS if q['id'] == question_id), None)
-    if not question:
-        return render(request, '404.html', status=404)
-
-    answers = generate_answers(random.randint(1, 15))
+    question = get_object_or_404(
+        Question.objects.annotate(
+            answers_count=Count('answer_question')
+        ).prefetch_related('tags'),
+        pk=question_id
+    )
+    answers = question.answer_question.all().order_by('-created')
     page = paginate(answers, request, 3)
-
-    question['answers'] = page.object_list
 
     return render(request, 'single_question.html', {
         'question': question,
+        'answers': page.object_list,
         'page_obj': page
     })
 
 
 def tag(request, tag_name):
-    tagged_questions = [q for q in QUESTIONS if tag_name in q['tags']]
-    page = paginate(tagged_questions, request, 5)
+    tag = get_object_or_404(Tag, title=tag_name)
+    questions = Question.objects.tagged(tag_name).annotate(
+        answers_count=Count('answer_question')
+    )
+    page = paginate(questions, request, 5)
     return render(request, 'tag.html', {
         'questions': page.object_list,
         'page_obj': page,
@@ -88,50 +70,136 @@ def tag(request, tag_name):
 
 
 def login_view(request):
-    error = None
     if request.method == 'POST':
-        error = "Wrong password!"
-        return render(request, 'login.html', {'error': error})
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('index')
+        return render(request, 'login.html', {'error': 'Invalid username or password'})
     return render(request, 'login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
 
 
 def signup(request):
     if request.method == 'POST':
-        error = "This email is already registered!"
-        return render(request, 'signup.html', {'error': error})
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        if password1 != password2:
+            return render(request, 'signup.html', {'error': 'Passwords do not match'})
+
+        if User.objects.filter(username=username).exists():
+            return render(request, 'signup.html', {'error': 'Username already exists'})
+
+        if User.objects.filter(email=email).exists():
+            return render(request, 'signup.html', {'error': 'Email already registered'})
+
+        user = User.objects.create_user(username=username, email=email, password=password1)
+        profile = Profile(user=user)
+
+        if 'avatar' in request.FILES:
+            profile.avatar = request.FILES['avatar']
+
+        profile.save()
+        login(request, user)
+        return redirect('index')
+
     return render(request, 'signup.html')
 
 
+@login_required
 def ask(request):
     if request.method == 'POST':
-        new_id = len(QUESTIONS) + 1
-        new_question = {
-            'title': request.POST.get('title', 'New Question'),
-            'id': new_id,
-            'text': request.POST.get('text', 'Question text'),
-            'rating': 0,
-            'answers_count': 0,
-            'img_path': 'img/image.jpg',
-            'tags': ['new', 'question']
-        }
-        QUESTIONS.append(new_question)
-        return redirect('question', question_id=new_id)
+        question = Question.objects.create(
+            title=request.POST.get('title', 'New Question'),
+            content=request.POST.get('text', 'Question text'),
+            author=request.user
+        )
+        tags = request.POST.get('tags', '').split()
+        for tag_name in tags:
+            tag, _ = Tag.objects.get_or_create(title=tag_name)
+            question.tags.add(tag)
+        return redirect('question', question_id=question.id)
     return render(request, 'ask.html')
 
 
+@login_required
 def add_answer(request, question_id):
     if request.method == 'POST':
-        question = next((q for q in QUESTIONS if q['id'] == question_id), None)
-        if question:
-            new_answer = {
-                'text': request.POST.get('answer_text', ''),
-                'rating': 0,
-                'is_correct': False,
-                'author': 'current_user'
-            }
-            if 'answers' not in question:
-                question['answers'] = []
-            question['answers'].append(new_answer)
-            question['answers_count'] = len(question['answers'])
+        question = get_object_or_404(Question, pk=question_id)
+        Answer.objects.create(
+            content=request.POST.get('answer_text', ''),
+            author=request.user,
+            question=question
+        )
         return redirect('question', question_id=question_id)
     return redirect('index')
+
+
+@login_required
+def like_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    like, created = QuestionLike.objects.get_or_create(
+        user=request.user,
+        question=question
+    )
+    if not created:
+        like.delete()
+    return redirect('question', question_id=question_id)
+
+
+@login_required
+def like_answer(request, answer_id):
+    answer = get_object_or_404(Answer, pk=answer_id)
+    like, created = AnswerLike.objects.get_or_create(
+        user=request.user,
+        answer=answer
+    )
+    if not created:
+        like.delete()
+    return redirect('question', question_id=answer.question.id)
+
+@login_required
+def dislike_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    like, created = QuestionLike.objects.get_or_create(
+        user=request.user,
+        question=question,
+        defaults={'is_like': False}
+    )
+    if not created:
+        like.is_like = not like.is_like
+        like.save()
+    return redirect('question', question_id=question_id)
+
+@login_required
+def dislike_answer(request, answer_id):
+    answer = get_object_or_404(Answer, id=answer_id)
+    like, created = AnswerLike.objects.get_or_create(
+        user=request.user,
+        answer=answer,
+        defaults={'is_like': False}
+    )
+    if not created:
+        like.is_like = not like.is_like
+        like.save()
+    return redirect('question', question_id=answer.question.id)
+
+
+@login_required
+def mark_answer_helpful(request, answer_id):
+    answer = get_object_or_404(Answer, id=answer_id)
+
+    if request.user == answer.question.author:
+        answer.toggle_helpful()
+
+    return redirect('question', question_id=answer.question.id)

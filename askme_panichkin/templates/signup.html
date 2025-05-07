@@ -8,11 +8,11 @@
         <div class="card-body">
             <h2 class="card-title mb-4">Registration</h2>
             
-            {% if form.errors %}
-                <div class="alert alert-danger">Please correct the errors below</div>
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
             {% endif %}
-            
-            <form method="post" enctype="multipart/form-data">
+
+            <form method="post" enctype="multipart/form-data" action="{% url 'signup' %}">
                 {% csrf_token %}
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -38,7 +38,7 @@
                 
                 <div class="mb-3">
                     <label for="avatar" class="form-label">Avatar (optional)</label>
-                    <input type="file" class="form-control" id="avatar" name="avatar">
+                    <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
                 </div>
                 
                 <button type="submit" class="btn btn-primary w-100">Register</button>

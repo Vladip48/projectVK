@@ -19,34 +19,23 @@
                 {% block content %}{% endblock %}
             </div>
             <aside class="col-3">
-
                 <section class="mb-3">
                     <h3>Popular tags</h3>
                     <div>
-                        <span class="badge rounded-pill text-bg-primary">Primary</span>
-                        <span class="badge rounded-pill text-bg-secondary">Secondary</span>
-                        <span class="badge rounded-pill text-bg-success">Success</span>
-                        <span class="badge rounded-pill text-bg-danger">Danger</span>
-                        <span class="badge rounded-pill text-bg-warning">Warning</span>
-                        <span class="badge rounded-pill text-bg-info">Info</span>
-                        <span class="badge rounded-pill text-bg-light">Light</span>
-                        <span class="badge rounded-pill text-bg-dark">Dark</span>
+                        {% for tag in popular_tags %}
+                            <a href="{% url 'tag' tag.title %}" class="badge rounded-pill text-bg-primary me-1 mb-1">{{ tag.title }}</a>
+                        {% endfor %}
                     </div>
                 </section>
 
                 <section>
                     <h3>Best members</h3>
                     <div>
-                        <a class="d-block" href="#">Member</a>
-                        <a class="d-block" href="#">Member</a>
-                        <a class="d-block" href="#">Member</a>
-                        <a class="d-block" href="#">Member</a>
-                        <a class="d-block" href="#">Member</a>
-                        <a class="d-block" href="#">Member</a>
-                        <a class="d-block" href="#">Member</a>
+                        {% for user in top_users %}
+                            <a class="d-block" href="#">{{ user.user.username }}</a>
+                        {% endfor %}
                     </div>
                 </section>
-
             </aside>
         </div>
     </main>

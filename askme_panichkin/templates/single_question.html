@@ -3,27 +3,28 @@
 
 {% block content %}
 <div class="col-lg-8 mb-4">
-
     <div class="row mb-4">
         <div class="col-2">
             <div class="border mb-2 d-flex align-items-center justify-content-center bg-light" style="height: 100px;">
-                <img src="{% static question.img_path %}" alt="Avatar" class="img-fluid">
+                {% if question.author.profile.avatar %}
+                    <img src="{{ question.author.profile.avatar.url }}" alt="avatar" class="img-fluid">
+                {% else %}
+                    <img src="{% static 'images/default_avatar.jpg' %}" alt="avatar" class="img-fluid">
+                {% endif %}
             </div>
             <div class="d-flex flex-column align-items-center">
-
                 <button class="btn btn-sm btn-outline-success d-flex align-items-center mb-1"
-                        onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
+                        onclick="location.href='{% url 'like_question' question.id %}'">
                     <i class="bi bi-arrow-up me-1"></i>
                     <span class="badge bg-success bg-opacity-10 text-success ms-1">
-                        {{ question.likes|default:0 }}
+                        {{ question.like_count }}
                     </span>
                 </button>
-
                 <button class="btn btn-sm btn-outline-danger d-flex align-items-center"
-                        onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
+                        onclick="location.href='{% url 'dislike_question' question.id %}'">
                     <i class="bi bi-arrow-down me-1"></i>
                     <span class="badge bg-danger bg-opacity-10 text-danger ms-1">
-                        {{ question.dislikes|default:0 }}
+                        {{ question.dislike_count }}
                     </span>
                 </button>
             </div>
@@ -31,13 +32,13 @@
         <div class="col d-flex flex-column justify-content-between">
             <div>
                 <h2 class="mb-3 fw-normal">{{ question.title }}</h2>
-                <p class="mb-3">{{ question.text }}</p>
+                <p class="mb-3">{{ question.content }}</p>
             </div>
             <div class="d-flex align-items-center">
                 <span class="me-2">Tags:</span>
                 <div>
-                    {% for tag in question.tags %}
-                        <a href="{% url 'tag' tag %}" class="badge bg-secondary text-decoration-none me-1">{{ tag }}</a>
+                    {% for tag in question.tags.all %}
+                        <a href="{% url 'tag' tag.title %}" class="badge bg-secondary text-decoration-none me-1">{{ tag.title }}</a>
                     {% endfor %}
                 </div>
             </div>
@@ -46,41 +47,49 @@
 
     <hr class="my-4">
 
-    {% for answer in question.answers %}
+    {% for answer in answers %}
     <div class="card mb-3">
         <div class="card-body">
             <div class="row">
                 <div class="col-2">
-                    <div style="height: 100px;" class="border mb-2 w-100">
-                        <img src="{% static question.img_path %}" alt="img" class="img-fluid">
+                    <div style="height: 100px;" class="border mb-2 w-100 d-flex align-items-center justify-content-center">
+                        {% if question.author.profile.avatar %}
+                            <img src="{{ question.author.profile.avatar.url }}" alt="avatar" class="img-fluid">
+                        {% else %}
+                            <img src="{% static 'images/default_avatar.jpg' %}" alt="avatar" class="img-fluid">
+                        {% endif %}
                     </div>
                     <div class="d-flex flex-column align-items-center">
-
                         <button class="btn btn-sm btn-outline-success d-flex align-items-center mb-1"
-                                onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
+                                onclick="location.href='{% url 'like_answer' answer.id %}'">
                             <i class="bi bi-arrow-up me-1"></i>
                             <span class="badge bg-success bg-opacity-10 text-success ms-1">
-                                {{ answer.likes|default:0 }}
+                                {{ answer.like_count }}
                             </span>
                         </button>
-
                         <button class="btn btn-sm btn-outline-danger d-flex align-items-center"
-                                onclick="this.querySelector('span').textContent = parseInt(this.querySelector('span').textContent) + 1">
+                                onclick="location.href='{% url 'dislike_answer' answer.id %}'">
                             <i class="bi bi-arrow-down me-1"></i>
                             <span class="badge bg-danger bg-opacity-10 text-danger ms-1">
-                                {{ answer.dislikes|default:0 }}
+                                {{ answer.dislike_count }}
                             </span>
                         </button>
                     </div>
                 </div>
                 <div class="col d-flex flex-column justify-content-between">
                     <div>
-                        <p class="card-text">{{ answer.text }}</p>
+                        <p class="card-text">{{ answer.content }}</p>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" {% if answer.is_correct %}checked{% endif %}>
-                        <label class="form-check-label">Correct</label>
-                    </div>
+    <form method="post" action="{% url 'mark_answer_helpful' answer.id %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm {% if answer.helpful %}btn-success{% else %}btn-outline-secondary{% endif %}"
+                {% if request.user != question.author %}disabled{% endif %}>
+            <i class="bi bi-check-circle"></i>
+            {% if answer.helpful %}Marked as Correct{% else %}Mark as Correct{% endif %}
+        </button>
+    </form>
+</div>
                 </div>
             </div>
         </div>
@@ -92,9 +101,10 @@
     <div class="card mt-3">
         <div class="card-body">
             <h5 class="card-title mb-3">Enter your answer here.</h5>
-            <form>
+            <form method="post" action="{% url 'add_answer' question.id %}">
+                {% csrf_token %}
                 <div class="mb-3">
-                    <textarea class="form-control" rows="5" placeholder="Your answer..."></textarea>
+                    <textarea class="form-control" name="answer_text" rows="5" placeholder="Your answer..." required></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Answer</button>
             </form>
