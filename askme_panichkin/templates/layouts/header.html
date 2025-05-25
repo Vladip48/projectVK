@@ -33,3 +33,35 @@
         </div>
     </div>
 </nav>
+
+<script>
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+let searchTimeout;
+
+searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+
+    if (this.value.length < 3) {
+        searchResults.innerHTML = '';
+        return;
+    }
+
+    searchTimeout = setTimeout(() => {
+        fetch(`/search/suggestions/?q=${encodeURIComponent(this.value)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.results.length > 0) {
+                    let html = '<ul>';
+                    data.results.forEach(item => {
+                        html += `<li><a href="${item.url}">${item.title}</a></li>`;
+                    });
+                    html += '</ul>';
+                    searchResults.innerHTML = html;
+                } else {
+                    searchResults.innerHTML = '<div>Ничего не найдено</div>';
+                }
+            });
+    }, 300);
+});
+</script>

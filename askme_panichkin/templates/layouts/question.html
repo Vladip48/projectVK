@@ -52,4 +52,18 @@
             </div>
         </div>
     </div>
+
+    <script src="{% static 'centrifuge/centrifuge.min.js' %}"></script>
+<script>
+    const centrifuge = new Centrifuge('ws://your-centrifugo-server/connection/websocket', {
+        token: "{% centrifugo_token request.user %}"
+    });
+
+    centrifuge.subscribe("questions:question_{{ question.id }}", function(message) {
+        const answersList = document.querySelector('.answers-list');
+        answersList.insertAdjacentHTML('beforeend', message.data.html);
+    });
+
+    centrifuge.connect();
+</script>
 </article>

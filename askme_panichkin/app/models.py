@@ -3,6 +3,8 @@ from django.db import models
 from django.db.models import Count
 from django.urls import reverse
 from django.conf import settings
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 
 class QuestionManager(models.Manager):
     def new(self):
@@ -27,6 +29,7 @@ class Question(models.Model):
     updated = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('Tag', related_name='question_tags')
     objects = QuestionManager()
+    search_vector = SearchVectorField(null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -45,6 +48,11 @@ class Question(models.Model):
 
     class Meta:
         db_table = 'question'
+
+    class Meta:
+        indexes = [
+            GinIndex(fields=['search_vector'])
+        ]
 
 
 class QuestionLike(models.Model):

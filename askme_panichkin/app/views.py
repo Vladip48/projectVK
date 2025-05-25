@@ -9,6 +9,7 @@ from django.db.models import Count
 from django.contrib.auth import update_session_auth_hash
 from .forms import LoginForm, SignUpForm, ProfileEditForm, QuestionForm, AnswerForm
 from django.http import JsonResponse
+from django.contrib.postgres.search import SearchQuery, SearchRank
 
 def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
@@ -278,3 +279,54 @@ def mark_answer_helpful(request, answer_id):
             })
 
     return redirect('question', question_id=answer.question.id)
+
+
+def add_answer(request, question_id):
+    if request.method == "POST":
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.question_id = question_id
+            answer.author = request.user
+            answer.save()
+
+            # Отправка в Centrifugo
+            data = {
+                "channel": f"questions:question_{question_id}",
+                "data": {
+                    "html": render_to_string("answers/answer_item.html", {"answer": answer})
+                }
+            }
+            headers = {
+                "Content-type": "application/json",
+                "Authorization": f"apikey your-api-key"
+            }
+            requests.post(
+                "http://centrifugo:8000/api/publish",
+                json=data,
+                headers=headers
+            )
+
+            return JsonResponse({"status": "ok"})
+    return JsonResponse({"status": "error"}, status=400)
+
+
+def search_suggestions(request):
+    query = request.GET.get('q', '')
+
+    if len(query) < 3:
+        return JsonResponse({'results': []})
+
+    search_query = SearchQuery(query)
+    results = Question.objects.annotate(
+        rank=SearchRank('search_vector', search_query)
+    ).filter(
+        search_vector=search_query
+    ).order_by('-rank')[:5]
+
+    suggestions = [{
+        'title': q.title,
+        'url': q.get_absolute_url()
+    } for q in results]
+
+    return JsonResponse({'results': suggestions})
