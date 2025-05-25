@@ -1,4 +1,5 @@
 {% extends "layouts/base.html" %}
+{% load bootstrap5 %}
 
 {% block title %}Sign Up{% endblock %}
 
@@ -7,42 +8,11 @@
     <div class="card">
         <div class="card-body">
             <h2 class="card-title mb-4">Registration</h2>
-            
-            {% if error %}
-                <div class="alert alert-danger">{{ error }}</div>
-            {% endif %}
 
             <form method="post" enctype="multipart/form-data" action="{% url 'signup' %}">
                 {% csrf_token %}
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="password1" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password1" name="password1" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="password2" class="form-label">Repeat Password</label>
-                        <input type="password" class="form-control" id="password2" name="password2" required>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="avatar" class="form-label">Avatar (optional)</label>
-                    <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
-                </div>
-                
+                {% bootstrap_form form %}
                 <button type="submit" class="btn btn-primary w-100">Register</button>
-                
                 <div class="text-center mt-3">
                     <a href="{% url 'login' %}" class="text-decoration-none">Already have an account? Log in</a>
                 </div>

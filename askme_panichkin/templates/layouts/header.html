@@ -20,7 +20,7 @@
                 <div>
                     <div>{{ user.username }}</div>
                     <div class="d-flex gap-2">
-                        <a href="#">Settings</a>
+                        <a href="{% url 'profile_edit' %}">Settings</a>
                         <a href="{% url 'logout' %}">Log out</a>
                     </div>
                 </div>

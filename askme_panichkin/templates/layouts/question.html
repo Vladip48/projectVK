@@ -4,25 +4,25 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-2">
-                    <div style="height: 100px;" class="border mb-2 w-100 d-flex align-items-center justify-content-center">
+                    <div style="height: 100px; overflow: hidden;" class="border mb-2 w-100 d-flex align-items-center justify-content-center">
                         {% if question.author.profile.avatar %}
-                            <img src="{{ question.author.profile.avatar.url }}" alt="avatar" class="img-fluid">
+                            <img src="{{ question.author.profile.avatar.url }}" alt="avatar" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                         {% else %}
-                            <img src="{% static 'images/default_avatar.jpg' %}" alt="avatar" class="img-fluid">
+                            <img src="{% static 'images/default_avatar.jpg' %}" alt="avatar" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                         {% endif %}
                     </div>
                     <div class="d-flex flex-column align-items-center">
-                        <button class="btn btn-sm btn-outline-success d-flex align-items-center mb-1"
-                                onclick="location.href='{% url 'like_question' question.id %}'">
+                        <button class="btn btn-sm btn-outline-success d-flex align-items-center mb-1 like-question"
+                                data-question-id="{{ question.id }}" data-action="like">
                             <i class="bi bi-arrow-up me-1"></i>
-                            <span class="badge bg-success bg-opacity-10 text-success ms-1">
+                            <span class="badge bg-success bg-opacity-10 text-success ms-1 like-count">
                                 {{ question.like_count }}
                             </span>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger d-flex align-items-center"
-                                onclick="location.href='{% url 'dislike_question' question.id %}'">
+                        <button class="btn btn-sm btn-outline-danger d-flex align-items-center dislike-question"
+                                data-question-id="{{ question.id }}" data-action="dislike">
                             <i class="bi bi-arrow-down me-1"></i>
-                            <span class="badge bg-danger bg-opacity-10 text-danger ms-1">
+                            <span class="badge bg-danger bg-opacity-10 text-danger ms-1 dislike-count">
                                 {{ question.dislike_count }}
                             </span>
                         </button>
