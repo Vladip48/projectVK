@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app.apps.AppConfig',
-    'bootstrap5',
+    #'bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -140,6 +140,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = BASE_DIR / 'uploads'
 MEDIA_URL = '/uploads/'
 
-CSRF_COOKIE_SECURE = False  # True if using HTTPS
-CSRF_COOKIE_HTTPONLY = False
-SESSION_COOKIE_SECURE = False
+
