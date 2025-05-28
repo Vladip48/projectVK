@@ -1,3 +1,22 @@
+function setupCentrifugo() {
+    if (window.location.pathname.startsWith('/question/')) {
+        const questionId = window.location.pathname.split('/')[2];
+        const centrifuge = new Centrifuge(`${window.CENTRIFUGO_URL}/connection/websocket`, {
+            token: window.CENTRIFUGO_TOKEN
+        });
+
+        centrifuge.subscribe(`questions:question_${questionId}`, function(message) {
+            const answersList = document.querySelector('.answers-list');
+            if (answersList) {
+                answersList.insertAdjacentHTML('beforeend', message.data.html);
+                setupAnswerLikes();
+            }
+        });
+
+        centrifuge.connect();
+    }
+}
+
 function setupQuestionLikes() {
     $('.like-question, .dislike-question').off('click').on('click', function(e) {
         e.preventDefault();

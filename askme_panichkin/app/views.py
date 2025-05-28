@@ -10,6 +10,9 @@ from django.contrib.auth import update_session_auth_hash
 from .forms import LoginForm, SignUpForm, ProfileEditForm, QuestionForm, AnswerForm
 from django.http import JsonResponse
 from django.contrib.postgres.search import SearchQuery, SearchRank
+from django.template.loader import render_to_string
+import requests
+from django.conf import settings
 
 def paginate(objects_list, request, per_page=10):
     paginator = Paginator(objects_list, per_page)
@@ -281,6 +284,7 @@ def mark_answer_helpful(request, answer_id):
     return redirect('question', question_id=answer.question.id)
 
 
+@login_required
 def add_answer(request, question_id):
     if request.method == "POST":
         form = AnswerForm(request.POST)
@@ -290,7 +294,6 @@ def add_answer(request, question_id):
             answer.author = request.user
             answer.save()
 
-            # Отправка в Centrifugo
             data = {
                 "channel": f"questions:question_{question_id}",
                 "data": {
@@ -299,10 +302,10 @@ def add_answer(request, question_id):
             }
             headers = {
                 "Content-type": "application/json",
-                "Authorization": f"apikey your-api-key"
+                "Authorization": f"apikey {settings.CENTRIFUGO_API_KEY}"
             }
             requests.post(
-                "http://centrifugo:8000/api/publish",
+                f"{settings.CENTRIFUGO_URL}/api/publish",
                 json=data,
                 headers=headers
             )

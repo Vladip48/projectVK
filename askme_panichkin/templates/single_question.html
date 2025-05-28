@@ -108,4 +108,13 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    window.CENTRIFUGO_URL = '{{ settings.CENTRIFUGO_URL }}';
+    window.CENTRIFUGO_TOKEN = '{% centrifugo_token request.user %}';
+</script>
+<script src="{% static 'centrifuge/centrifuge.min.js' %}"></script>
+{% endblock %}
+
 {% endblock %}
