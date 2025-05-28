@@ -140,4 +140,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = BASE_DIR / 'uploads'
 MEDIA_URL = '/uploads/'
 
-
+CENTRIFUGO_URL = "http://centrifugo.askme_panichkin.local:8000"
+CENTRIFUGO_API_KEY = "x1234-5678-90ab-cdef-ghijklmnopqr"
